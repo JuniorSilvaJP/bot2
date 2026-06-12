@@ -1,0 +1,18 @@
+{
+  "name": "botv2",
+  "version": "1.0.0",
+  "description": "Bot de recrutamento Discord para guilda do Albion",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "keywords": ["discord", "bot", "albion", "recrutamento"],
+  "author": "SeuNome",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "discord.js": "^14.0.0",
+    "dotenv": "^16.0.0"
+  }
+}
