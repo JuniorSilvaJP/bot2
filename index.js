@@ -56,71 +56,127 @@ client.on("guildMemberAdd", async (member) => {
 // ================= INTERAÇÕES =================
 client.on("interactionCreate", async (interaction) => {
 
-    // ================= SLASH COMMAND =================
-    if (interaction.isChatInputCommand()) {
+// ================= SLASH COMMAND =================
+if (interaction.isChatInputCommand()) {
 
-        // ===== /REGISTRO =====
-        if (interaction.commandName === "registro") {
+    // ===== /REGISTRO =====
+    if (interaction.commandName === "registro") {
 
-            // só no canal correto
-            if (interaction.channel.id !== config.canalRecrutamento) {
-                return interaction.reply({
-                    content: "❌ Use este comando no canal de recrutamento.",
-                    ephemeral: true
-                });
-            }
-
-            // bloqueia staff
-            const isStaff =
-                interaction.member.roles.cache.has(config.cargoLider) ||
-                interaction.member.roles.cache.has(config.cargoComandante);
-
-            if (isStaff) {
-                return interaction.reply({
-                    content: "❌ Staff não pode se registrar.",
-                    ephemeral: true
-                });
-            }
-
-            // abre modal
-            const modal = new ModalBuilder()
-                .setCustomId("modal_registro")
-                .setTitle("📋 Cadastro de Recrutamento");
-
-            const nick = new TextInputBuilder()
-                .setCustomId("nick")
-                .setLabel("Seu Nick")
-                .setStyle(TextInputStyle.Short)
-                .setRequired(true);
-
-            const arma = new TextInputBuilder()
-                .setCustomId("arma")
-                .setLabel("Arma Favorita")
-                .setStyle(TextInputStyle.Short)
-                .setRequired(true);
-
-            const horario = new TextInputBuilder()
-                .setCustomId("horario")
-                .setLabel("Horário que joga")
-                .setStyle(TextInputStyle.Short)
-                .setRequired(true);
-
-            const ip = new TextInputBuilder()
-                .setCustomId("ip")
-                .setLabel("Seu IP")
-                .setStyle(TextInputStyle.Short)
-                .setRequired(true);
-
-            modal.addComponents(
-                new ActionRowBuilder().addComponents(nick),
-                new ActionRowBuilder().addComponents(arma),
-                new ActionRowBuilder().addComponents(horario),
-                new ActionRowBuilder().addComponents(ip)
-            );
-
-            return interaction.showModal(modal);
+        if (interaction.channel.id !== config.canalRecrutamento) {
+            return interaction.reply({
+                content: "❌ Use este comando no canal de recrutamento.",
+                ephemeral: true
+            });
         }
+
+        const isStaff =
+            interaction.member.roles.cache.has(config.cargoLider) ||
+            interaction.member.roles.cache.has(config.cargoComandante);
+
+        if (isStaff) {
+            return interaction.reply({
+                content: "❌ Staff não pode se registrar.",
+                ephemeral: true
+            });
+        }
+
+        const modal = new ModalBuilder()
+            .setCustomId("modal_registro")
+            .setTitle("📋 Cadastro de Recrutamento");
+
+        const nick = new TextInputBuilder()
+            .setCustomId("nick")
+            .setLabel("Seu Nick")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true);
+
+        const arma = new TextInputBuilder()
+            .setCustomId("arma")
+            .setLabel("Arma Favorita")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true);
+
+        const horario = new TextInputBuilder()
+            .setCustomId("horario")
+            .setLabel("Horário que joga")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true);
+
+        const ip = new TextInputBuilder()
+            .setCustomId("ip")
+            .setLabel("Seu IP")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true);
+
+        modal.addComponents(
+            new ActionRowBuilder().addComponents(nick),
+            new ActionRowBuilder().addComponents(arma),
+            new ActionRowBuilder().addComponents(horario),
+            new ActionRowBuilder().addComponents(ip)
+        );
+
+        return interaction.showModal(modal);
     }
+
+    // ===== /PAINEL =====
+    if (interaction.commandName === "painel") {
+
+        const isStaff =
+            interaction.member.roles.cache.has(config.cargoLider) ||
+            interaction.member.roles.cache.has(config.cargoComandante);
+
+        if (!isStaff) {
+            return interaction.reply({
+                content: "❌ Apenas staff pode usar este comando.",
+                ephemeral: true
+            });
+        }
+
+        const embed = new EmbedBuilder()
+            .setTitle("📋 Painel de Recrutamento")
+            .setDescription("Use /registro para iniciar um recrutamento.")
+            .setColor("Blue");
+
+        return interaction.reply({
+            embeds: [embed]
+        });
+    }
+
+    // ===== /CLEAR =====
+    if (interaction.commandName === "clear") {
+
+        const isStaff =
+            interaction.member.roles.cache.has(config.cargoLider) ||
+            interaction.member.roles.cache.has(config.cargoComandante);
+
+        if (!isStaff) {
+            return interaction.reply({
+                content: "❌ Apenas staff pode usar este comando.",
+                ephemeral: true
+            });
+        }
+
+        const quantidade =
+            interaction.options.getInteger("quantidade");
+
+        if (quantidade < 1 || quantidade > 100) {
+            return interaction.reply({
+                content: "❌ Escolha um valor entre 1 e 100.",
+                ephemeral: true
+            });
+        }
+
+        await interaction.channel.bulkDelete(
+            quantidade,
+            true
+        );
+
+        return interaction.reply({
+            content: `🗑️ ${quantidade} mensagens apagadas.`,
+            ephemeral: true
+        });
+    }
+}
 
     // ================= MODAL SUBMIT =================
     if (interaction.isModalSubmit()) {
